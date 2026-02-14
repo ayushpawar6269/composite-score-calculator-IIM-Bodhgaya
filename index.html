@@ -76,19 +76,11 @@ button:hover{opacity:.9;}
 
 .result-panel{
     margin-top:30px;
-    padding:25px;
+    padding:30px;
     border-radius:12px;
-    font-size:18px;
+    font-size:20px;
     font-weight:600;
-}
-
-.breakdown{
-    margin-top:15px;
-    font-size:14px;
-    font-weight:500;
-    border-top:1px solid #e5e7eb;
-    padding-top:15px;
-    line-height:1.7;
+    text-align:center;
 }
 
 .success{background:#ecfdf5;color:var(--success);}
@@ -189,7 +181,7 @@ Disclaimer: This is an unofficial estimation tool for educational purposes only.
 
 <script>
 const FULL_CAT=204;
-const HIGHEST_POOL=130;
+const HIGHEST_POOL=150;   // Updated
 
 const cutoff={
 General:55.291612,
@@ -246,6 +238,12 @@ const twelfth=parseFloat(document.getElementById("twelfth").value);
 const ug=parseFloat(document.getElementById("ug").value);
 const cert=document.getElementById("cert").value;
 
+if(cat>204){
+document.getElementById("result").innerHTML=
+`<div class="result-panel danger">CAT Score cannot exceed 204</div>`;
+return;
+}
+
 const academic=calculateAcademic(tenth,twelfth,ug,cert);
 const workexScore=calculateWorkex(workex);
 const catWeighted=calculateCAT(cat);
@@ -255,20 +253,11 @@ const decision=calculateDecision(finalScore,category);
 
 document.getElementById("result").innerHTML=
 `<div class="result-panel ${decision.class}">
-<div style="font-size:22px;margin-bottom:8px;">
+<div style="font-size:26px;margin-bottom:15px;">
 Composite Score: ${finalScore}
 </div>
-
-<div style="margin-bottom:12px;">
+<div>
 ${decision.msg}
-</div>
-
-<div class="breakdown">
-<strong>Score Breakdown</strong><br><br>
-CAT (50%): ${catWeighted}<br>
-PI (25%): ${piWeighted}<br>
-Academic (15%): ${academic}<br>
-Work Experience (10%): ${workexScore}
 </div>
 </div>`;
 });
