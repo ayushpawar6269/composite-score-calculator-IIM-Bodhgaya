@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Composite Score Calculator – IIM Bodh Gaya 2026–2028</title>
+
+<style>
+:root{
+    --iim-gold:#b48a2c;
+    --bg:#f4f6fb;
+    --card:#ffffff;
+    --success:#15803d;
+    --warning:#b45309;
+    --danger:#b91c1c;
+}
+*{box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
+body{margin:0;background:var(--bg);}
+
+.header{
+    background:var(--iim-gold);
+    color:white;
+    padding:22px 40px;
+    font-size:24px;
+    font-weight:600;
+    letter-spacing:.6px;
+}
+
+.wrapper{
+    display:flex;
+    justify-content:center;
+    padding:60px 20px;
+}
+
+.card{
+    background:var(--card);
+    padding:40px;
+    border-radius:14px;
+    width:100%;
+    max-width:900px;
+    box-shadow:0 15px 30px rgba(0,0,0,0.08);
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+}
+
+label{
+    font-size:13px;
+    font-weight:600;
+    color:#374151;
+}
+
+input,select{
+    width:100%;
+    padding:10px;
+    border-radius:6px;
+    border:1px solid #d1d5db;
+}
+
+button{
+    margin-top:25px;
+    width:100%;
+    padding:14px;
+    background:var(--iim-gold);
+    color:white;
+    border:none;
+    border-radius:8px;
+    font-size:16px;
+    cursor:pointer;
+}
+
+button:hover{opacity:.9;}
+
+.result-panel{
+    margin-top:30px;
+    padding:25px;
+    border-radius:12px;
+    font-size:18px;
+    font-weight:600;
+}
+
+.breakdown{
+    margin-top:15px;
+    font-size:14px;
+    font-weight:500;
+    border-top:1px solid #e5e7eb;
+    padding-top:15px;
+    line-height:1.7;
+}
+
+.success{background:#ecfdf5;color:var(--success);}
+.warning{background:#fffbeb;color:var(--warning);}
+.danger{background:#fef2f2;color:var(--danger);}
+
+.footer{
+    margin-top:40px;
+    font-size:12px;
+    text-align:center;
+    color:#6b7280;
+}
+
+@media(max-width:700px){
+    .grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+Composite Score Calculator – IIM Bodh Gaya 2026–2028
+</div>
+
+<div class="wrapper">
+<div class="card">
+
+<form id="form">
+<div class="grid">
+
+<div>
+<label>CAT Score</label>
+<input type="number" id="cat" step="0.01" max="204" required>
+</div>
+
+<div>
+<label>PI Score (Out of 100)</label>
+<input type="number" id="pi" max="100" required>
+</div>
+
+<div>
+<label>Work Experience (Months)</label>
+<input type="number" id="workex" required>
+</div>
+
+<div>
+<label>Category</label>
+<select id="category" required>
+<option value="">Select</option>
+<option value="General">General</option>
+<option value="EWS">EWS</option>
+<option value="NC-OBC">NC-OBC</option>
+<option value="SC">SC</option>
+<option value="ST">ST</option>
+<option value="PWD">PWD</option>
+</select>
+</div>
+
+<div>
+<label>10th %</label>
+<input type="number" id="tenth" step="0.01" required>
+</div>
+
+<div>
+<label>12th %</label>
+<input type="number" id="twelfth" step="0.01" required>
+</div>
+
+<div>
+<label>UG %</label>
+<input type="number" id="ug" step="0.01" required>
+</div>
+
+<div>
+<label>Certification</label>
+<select id="cert">
+<option value="">None</option>
+<option value="CA">CA</option>
+<option value="CS">CS</option>
+<option value="CMA">CMA</option>
+</select>
+</div>
+
+</div>
+
+<button type="submit">Evaluate</button>
+</form>
+
+<div id="result"></div>
+
+<div class="footer">
+Disclaimer: This is an unofficial estimation tool for educational purposes only. Final admission decisions are solely determined by IIM Bodh Gaya.
+</div>
+
+</div>
+</div>
+
+<script>
+const FULL_CAT=204;
+const HIGHEST_POOL=130;
+
+const cutoff={
+General:55.291612,
+EWS:51.442718,
+"NC-OBC":49.474855,
+SC:44.546031,
+ST:30.776932,
+PWD:0
+};
+
+function calculateAcademic(tenth,twelfth,ug,cert){
+let score=0;
+if(tenth>=70) score+=4;
+if(twelfth>=70) score+=5;
+if(["CA","CS","CMA"].includes(cert)) score+=6;
+else if(ug>=60) score+=6;
+return score;
+}
+
+function calculateWorkex(months){
+const years=months/12;
+if(years<1) return 0;
+if(years<2) return 5;
+if(years<=4) return 10;
+return 5;
+}
+
+function calculateCAT(cat){
+return Number((((cat+(FULL_CAT-HIGHEST_POOL))/FULL_CAT)*50).toFixed(3));
+}
+
+function calculatePI(pi){
+return Number(((pi/100)*25).toFixed(3));
+}
+
+function calculateDecision(score,category){
+const selectedCutoff=cutoff[category] ?? 0;
+if(score>=selectedCutoff+5)
+return {class:"success",msg:"Strong Chance of Convert"};
+if(score>=selectedCutoff-5)
+return {class:"warning",msg:"Chances of Convert"};
+return {class:"danger",msg:"Waitlisted<br><br>Don’t reject yourself, let the bloody IIM reject you 😺"};
+}
+
+document.getElementById("form").addEventListener("submit",function(e){
+e.preventDefault();
+
+const cat=parseFloat(document.getElementById("cat").value);
+const pi=parseFloat(document.getElementById("pi").value);
+const workex=parseInt(document.getElementById("workex").value);
+const category=document.getElementById("category").value;
+const tenth=parseFloat(document.getElementById("tenth").value);
+const twelfth=parseFloat(document.getElementById("twelfth").value);
+const ug=parseFloat(document.getElementById("ug").value);
+const cert=document.getElementById("cert").value;
+
+const academic=calculateAcademic(tenth,twelfth,ug,cert);
+const workexScore=calculateWorkex(workex);
+const catWeighted=calculateCAT(cat);
+const piWeighted=calculatePI(pi);
+const finalScore=Number((catWeighted+piWeighted+academic+workexScore).toFixed(3));
+const decision=calculateDecision(finalScore,category);
+
+document.getElementById("result").innerHTML=
+`<div class="result-panel ${decision.class}">
+<div style="font-size:22px;margin-bottom:8px;">
+Composite Score: ${finalScore}
+</div>
+
+<div style="margin-bottom:12px;">
+${decision.msg}
+</div>
+
+<div class="breakdown">
+<strong>Score Breakdown</strong><br><br>
+CAT (50%): ${catWeighted}<br>
+PI (25%): ${piWeighted}<br>
+Academic (15%): ${academic}<br>
+Work Experience (10%): ${workexScore}
+</div>
+</div>`;
+});
+</script>
+
+</body>
+</html>
